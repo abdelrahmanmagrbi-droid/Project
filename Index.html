@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصمم السيرة الذاتية الاحترافي | Pro CV Builder</title>
+
+    <!-- Tailwind CSS CDN (Gracefully falls back to layout/print styles if offline) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Arabic & English (Falls back cleanly to system fonts offline) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons (with inline SVG/text fallback readiness) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        if (window.tailwind) {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            cairo: ['Cairo', 'Segoe UI', 'Tahoma', 'Arial', 'sans-serif'],
+                            tajawal: ['Tajawal', 'Segoe UI', 'Tahoma', 'Arial', 'sans-serif'],
+                            ibm: ['IBM Plex Sans Arabic', 'Segoe UI', 'Tahoma', 'Arial', 'sans-serif'],
+                            inter: ['Inter', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+                            roboto: ['Roboto', 'Inter', 'Arial', 'sans-serif'],
+                        }
+                    }
+                }
+            };
+        }
+    </script>
+
+    <style>
+        /* Base UI Styles */
+        body {
+            font-family: 'Cairo', 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* A4 Page Dimensions & Scaling */
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        /* Responsive Preview Scaling on smaller viewports */
+        @media screen and (max-width: 1280px) {
+            .preview-scale-wrapper {
+                transform: scale(0.82);
+                transform-origin: top center;
+                margin-bottom: -50mm;
+            }
+        }
+        @media screen and (max-width: 1024px) {
+            .preview-scale-wrapper {
+                transform: scale(0.85);
+                transform-origin: top center;
+                margin-bottom: -40mm;
+            }
+        }
+        @media screen and (max-width: 768px) {
+            .preview-scale-wrapper {
+                transform: scale(0.46);
+                transform-origin: top center;
+                margin-bottom: -155mm;
+            }
+        }
+        @media screen and (max-width: 420px) {
+            .preview-scale-wrapper {
+                transform: scale(0.39);
+                transform-origin: top center;
+                margin-bottom: -178mm;
+            }
+        }
+
+        /* Print Media Query - Exact A4 Output without UI Chrome */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #preview-pane {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                position: static !important;
+            }
+            .preview-scale-wrapper {
+                transform: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .a4-container {
+                width: 210mm !important;
+                min-height: 297mm !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+            }
+        }
+
+        :root {
+            --cv-accent: #1e40af;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="no-print fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="no-print hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200 transform transition-all">
+            <div class="flex items-center gap-3 text-amber-600 mb-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <h3 id="confirm-title" class="text-lg font-bold text-slate-800">تأكيد الإجراء</h3>
+            </div>
+            <p id="confirm-message" class="text-slate-600 text-sm leading-relaxed mb-6">هل أنت متأكد من رغبتك في المتابعة؟</p>
+            <div class="flex items-center justify-end gap-3">
+                <button id="confirm-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">إلغاء</button>
+                <button id="confirm-ok-btn" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 transition">نعم، متابعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation / Action Toolbar -->
+    <header class="no-print bg-white border-b border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 z-30 shadow-sm">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-700 text-white flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-file-signature text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-slate-800 leading-tight" data-ui="appTitle">مصمم السيرة الذاتية</h1>
+                <p class="text-[11px] text-slate-500 hidden sm:block" data-ui="appSubtitle">أنشئ سيرتك الذاتية باحترافية وصدّرها بصيغة PDF</p>
+            </div>
+        </div>
+
+        <!-- Mobile View Switcher -->
+        <div class="flex lg:hidden bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button type="button" onclick="setMobileView('editor')" id="mob-btn-editor" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm transition">
+                <i class="fa-solid fa-pen-to-square ml-1"></i> <span data-ui="editTab">التحرير</span>
+            </button>
+            <button type="button" onclick="setMobileView('preview')" id="mob-btn-preview" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 transition">
+                <i class="fa-solid fa-eye ml-1"></i> <span data-ui="previewTab">المعاينة</span>
+            </button>
+        </div>
+
+        <!-- Global Controls -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- CV Language Toggle (AR / EN) -->
+            <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200" title="لغة السيرة الذاتية / CV Language">
+                <button type="button" onclick="setCVLanguage('ar')" id="lang-btn-ar" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-700 text-white transition">عربي</button>
+                <button type="button" onclick="setCVLanguage('en')" id="lang-btn-en" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">English</button>
+            </div>
+
+            <!-- Sample & Clear Actions -->
+            <button type="button" onclick="handleLoadSample()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span class="hidden md:inline" data-ui="loadSample">نموذج تجريبي</span>
+            </button>
+
+            <button type="button" onclick="handleClearAll()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-trash-can"></i>
+                <span class="hidden md:inline" data-ui="clearAll">مسح الكل</span>
+            </button>
+
+            <!-- JSON Backup Dropdown -->
+            <div class="relative inline-block">
+                <button type="button" onclick="toggleBackupMenu()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-database"></i>
+                    <span class="hidden sm:inline" data-ui="backup">نسخ احتياطي</span>
+                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                </button>
+                <div id="backup-menu" class="hidden absolute left-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-40">
+                    <button type="button" onclick="exportJSON()" class="w-full text-right px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                        <i class="fa-solid fa-download text-blue-600"></i> <span data-ui="exportJson">حفظ البيانات (JSON)</span>
+                    </button>
+                    <label class="w-full text-right px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-upload text-emerald-600"></i> <span data-ui="importJson">استعادة بيانات (JSON)</span>
+                        <input type="file" id="json-file-input" accept=".json,application/json" class="hidden" onchange="importJSON(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Print / Export PDF Button -->
+            <button type="button" onclick="printCV()" class="px-4 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-blue-700 text-white hover:bg-blue-800 shadow-sm hover:shadow transition flex items-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span data-ui="exportPdf">تصدير PDF / طباعة</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Split-Screen Workspace -->
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <!-- Editor & Design Customizer Pane -->
+        <section id="editor-pane" class="no-print w-full lg:w-[46%] xl:w-[44%] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden z-20">
+
+            <!-- Template, Color & Font Customizer Bar -->
+            <div class="bg-slate-50 border-b border-slate-200 p-3 shrink-0">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <!-- Template Selector -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1" data-ui="templateLabel">القالب التصميمي</label>
+                        <select id="template-select" onchange="updateDesign('template', this.value)" class="w-full text-xs font-semibold bg-white border border-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="modern">عصري (Modern)</option>
+                            <option value="classic">كلاسيكي (Classic - ATS)</option>
+                            <option value="executive">تنفيذي (Executive)</option>
+                        </select>
+                    </div>
+
+                    <!-- Font Selector -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1" data-ui="fontLabel">نوع الخط</label>
+                        <select id="font-select" onchange="updateDesign('font', this.value)" class="w-full text-xs font-semibold bg-white border border-slate-300 rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="cairo">Cairo (عربي عصري)</option>
+                            <option value="tajawal">Tajawal (تجول)</option>
+                            <option value="ibm">IBM Plex Arabic</option>
+                            <option value="inter">Inter (English Clean)</option>
+                            <option value="roboto">Roboto (English Classic)</option>
+                        </select>
+                    </div>
+
+                    <!-- Accent Color Swatches -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1" data-ui="colorLabel">اللون الرئيسي</label>
+                        <div class="flex items-center gap-1.5 h-[34px]">
+                            <button type="button" onclick="updateDesign('color', '#1e40af')" class="w-6 h-6 rounded-full bg-[#1e40af] ring-2 ring-offset-1 ring-transparent focus:ring-slate-400 transition transform hover:scale-110" title="أزرق ملكي"></button>
+                            <button type="button" onclick="updateDesign('color', '#0f766e')" class="w-6 h-6 rounded-full bg-[#0f766e] ring-2 ring-offset-1 ring-transparent focus:ring-slate-400 transition transform hover:scale-110" title="أخضر زمردي"></button>
+                            <button type="button" onclick="updateDesign('color', '#334155')" class="w-6 h-6 rounded-full bg-[#334155] ring-2 ring-offset-1 ring-transparent focus:ring-slate-400 transition transform hover:scale-110" title="رمادي داكن"></button>
+                            <button type="button" onclick="updateDesign('color', '#7c2d12')" class="w-6 h-6 rounded-full bg-[#7c2d12] ring-2 ring-offset-1 ring-transparent focus:ring-slate-400 transition transform hover:scale-110" title="بني كلاسيكي"></button>
+                            <button type="button" onclick="updateDesign('color', '#6d28d9')" class="w-6 h-6 rounded-full bg-[#6d28d9] ring-2 ring-offset-1 ring-transparent focus:ring-slate-400 transition transform hover:scale-110" title="بنفسجي"></button>
+                            <input type="color" id="custom-color-picker" value="#1e40af" onchange="updateDesign('color', this.value)" class="w-6 h-6 rounded-full overflow-hidden border-0 p-0 cursor-pointer bg-transparent" title="لون مخصص">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Navigation Tabs -->
+            <div class="flex overflow-x-auto bg-white border-b border-slate-200 px-2 pt-2 gap-1 shrink-0" id="editor-tabs">
+                <button type="button" onclick="switchTab('personal')" data-tab="personal" class="tab-btn active px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-blue-700 text-blue-700 bg-blue-50/50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-user"></i> <span data-ui="tabPersonal">البيانات الشخصية</span>
+                </button>
+                <button type="button" onclick="switchTab('experience')" data-tab="experience" class="tab-btn px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-briefcase"></i> <span data-ui="tabExperience">الخبرات</span>
+                </button>
+                <button type="button" onclick="switchTab('education')" data-tab="education" class="tab-btn px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-graduation-cap"></i> <span data-ui="tabEducation">التعليم</span>
+                </button>
+                <button type="button" onclick="switchTab('skills')" data-tab="skills" class="tab-btn px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-sparkles"></i> <span data-ui="tabSkills">المهارات</span>
+                </button>
+                <button type="button" onclick="switchTab('projects')" data-tab="projects" class="tab-btn px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-diagram-project"></i> <span data-ui="tabProjects">المشاريع</span>
+                </button>
+                <button type="button" onclick="switchTab('extras')" data-tab="extras" class="tab-btn px-3 py-2 rounded-t-xl text-xs font-bold whitespace-nowrap border-b-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-award"></i> <span data-ui="tabExtras">اللغات والشهادات</span>
+                </button>
+            </div>
+
+            <!-- Form Content Container -->
+            <div id="form-container" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5"></div>
+        </section>
+
+        <!-- Live A4 Resume Preview Pane -->
+        <section id="preview-pane" class="hidden lg:flex flex-1 bg-slate-200/80 overflow-y-auto p-4 sm:p-8 justify-center items-start">
+            <div class="preview-scale-wrapper">
+                <div id="cv-document" class="a4-container" dir="rtl"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // 1. STATE & TRANSLATIONS CONFIGURATION
+        // ==========================================
+
+        const STORAGE_KEY = 'gh_pro_cv_builder_data_v1';
+
+        const UI_TEXT = {
+            ar: {
+                appTitle: "مصمم السيرة الذاتية",
+                appSubtitle: "أنشئ سيرتك الذاتية باحترافية وصدّرها بصيغة PDF",
+                editTab: "التحرير",
+                previewTab: "المعاينة",
+                loadSample: "نموذج تجريبي",
+                clearAll: "مسح الكل",
+                backup: "نسخ احتياطي",
+                exportJson: "حفظ البيانات (JSON)",
+                importJson: "استعادة بيانات (JSON)",
+                exportPdf: "تصدير PDF / طباعة",
+                templateLabel: "القالب التصميمي",
+                fontLabel: "نوع الخط",
+                colorLabel: "اللون الرئيسي",
+                tabPersonal: "البيانات الشخصية",
+                tabExperience: "الخبرات",
+                tabEducation: "التعليم",
+                tabSkills: "المهارات",
+                tabProjects: "المشاريع",
+                tabExtras: "اللغات والشهادات",
+                cvSummary: "الملخص المهني",
+                cvExperience: "الخبرات العملية",
+                cvEducation: "المؤهلات العلمية",
+                cvSkills: "المهارات التقنية والشخصية",
+                cvProjects: "أبرز المشاريع",
+                cvLanguages: "اللغات",
+                cvCertifications: "الشهادات والدورات",
+                cvContact: "معلومات التواصل"
+            },
+            en: {
+                appTitle: "Pro CV Builder",
+                appSubtitle: "Create & Export ATS-Friendly Resumes in PDF",
+                editTab: "Editor",
+                previewTab: "Preview",
+                loadSample: "Load Sample",
+                clearAll: "Clear All",
+                backup: "Backup",
+                exportJson: "Export JSON",
+                importJson: "Import JSON",
+                exportPdf: "Export PDF / Print",
+                templateLabel: "Template",
+                fontLabel: "Typography",
+                colorLabel: "Accent Color",
+                tabPersonal: "Personal Info",
+                tabExperience: "Experience",
+                tabEducation: "Education",
+                tabSkills: "Skills",
+                tabProjects: "Projects",
+                tabExtras: "Languages & Certs",
+                cvSummary: "Professional Summary",
+                cvExperience: "Work Experience",
+                cvEducation: "Education",
+                cvSkills: "Skills & Expertise",
+                cvProjects: "Key Projects",
+                cvLanguages: "Languages",
+                cvCertifications: "Certifications",
+                cvContact: "Contact Details"
+            }
+        };
+
+        const SAMPLE_DATA_AR = {
+            lang: 'ar',
+            design: { template: 'modern', color: '#1e40af', font: 'cairo' },
+            personal: {
+                fullName: 'أحمد محمد المنصور',
+                jobTitle: 'مهندس برمجيات أول ومطور تطبيقات الويب',
+                email: 'ahmed.mansour@example.com',
+                phone: '+966 50 123 4567',
+                location: 'الرياض، المملكة العربية السعودية',
+                website: 'linkedin.com/in/ahmed-mansour',
+                photo: '',
+                summary: 'مهندس برمجيات شغوف بخبرة تزيد عن 6 سنوات في تصميم وتطوير تطبيقات الويب عالية الأداء القابلة للتوسع. متخصص في بناء واجهات مستخدم تفاعلية حديثة وهندسة الأنظمة الخلفية، مع سجل حافل في قيادة الفرق التقنية وتحسين تجربة المستخدم.'
+            },
+            experience: [
+                {
+                    id: 'exp-1',
+                    position: 'مهندس برمجيات أول (Senior Frontend Engineer)',
+                    company: 'شركة تقنيات المستقبل الرقمية',
+                    location: 'الرياض',
+                    startDate: 'يناير 2023',
+                    endDate: 'حتى الآن',
+                    current: true,
+                    description: '• قيادة فريق مكون من 5 مطورين لبناء منصة التجارة الإلكترونية الرئيسية.\n• تحسين سرعة تحميل الصفحات بنسبة 45% عبر تطبيق تقنيات التخزين المؤقت وتحسين الكود.\n• تطوير نظام تصميم موحد (Design System) لتسريع العمل بين التصميم والبرمجة.'
+                },
+                {
+                    id: 'exp-2',
+                    position: 'مطور برمجيات متكامل (Full Stack Developer)',
+                    company: 'مؤسسة الحلول الذكية للبرمجيات',
+                    location: 'جدة',
+                    startDate: 'مارس 2020',
+                    endDate: 'ديسمبر 2022',
+                    current: false,
+                    description: '• تطوير وصيانة أكثر من 12 تطبيق ويب ولوحة تحكم لعملاء في القطاع المالي واللوجستي.\n• بناء واجهات برمجية (RESTful APIs) آمنة وربطها بقواعد البيانات.\n• أتمتة عمليات النشر والاختبار المستمر (CI/CD) وتقليل الأخطاء بنسبة 30%.'
+                }
+            ],
+            education: [
+                {
+                    id: 'edu-1',
+                    degree: 'بكالوريوس علوم الحاسب وهندسة البرمجيات',
+                    institution: 'جامعة الملك سعود',
+                    location: 'الرياض',
+                    startDate: '2016',
+                    endDate: '2020',
+                    grade: 'ممتاز مع مرتبة الشرف (4.75 / 5.00)'
+                }
+            ],
+            skills: [
+                { id: 'sk-1', name: 'JavaScript / TypeScript', level: 95 },
+                { id: 'sk-2', name: 'React.js & Next.js', level: 90 },
+                { id: 'sk-3', name: 'Node.js & Express', level: 85 },
+                { id: 'sk-4', name: 'Tailwind CSS & UI/UX', level: 92 },
+                { id: 'sk-5', name: 'PostgreSQL & MongoDB', level: 80 },
+                { id: 'sk-6', name: 'Git & Docker', level: 85 }
+            ],
+            projects: [
+                {
+                    id: 'prj-1',
+                    name: 'منصة إدارة المشاريع السحابية (TaskFlow)',
+                    role: 'المطور الرئيسي',
+                    link: 'github.com/ahmed/taskflow',
+                    description: 'تطبيق ويب متكامل لإدارة مهام الفرق عن بُعد مع تحديثات لحظية وتقارير تحليلية تفاعلية.'
+                },
+                {
+                    id: 'prj-2',
+                    name: 'نظام الفوترة الإلكترونية الذكي',
+                    role: 'مهندس الواجهات',
+                    link: 'fatoorah-app.example.com',
+                    description: 'نظام متوافق مع متطلبات الفوترة الإلكترونية وإدارة المخزون والفواتير.'
+                }
+            ],
+            languages: [
+                { id: 'lng-1', name: 'العربية', proficiency: 'اللغة الأم' },
+                { id: 'lng-2', name: 'الإنجليزية', proficiency: 'طلاقة مهنية (C1)' }
+            ],
+            certifications: [
+                { id: 'crt-1', name: 'AWS Certified Developer – Associate', issuer: 'Amazon Web Services', year: '2023' },
+                { id: 'crt-2', name: 'إدارة المشاريع الاحترافية (PMP)', issuer: 'معهد إدارة المشاريع PMI', year: '2022' }
+            ]
+        };
+
+        const SAMPLE_DATA_EN = {
+            lang: 'en',
+            design: { template: 'modern', color: '#1e40af', font: 'inter' },
+            personal: {
+                fullName: 'Ahmed Al-Mansoor',
+                jobTitle: 'Senior Software Engineer & Full-Stack Developer',
+                email: 'ahmed.mansoor@example.com',
+                phone: '+966 50 123 4567',
+                location: 'Riyadh, Saudi Arabia',
+                website: 'linkedin.com/in/ahmed-mansour',
+                photo: '',
+                summary: 'Results-driven Senior Software Engineer with 6+ years of experience architecting scalable web applications and intuitive user interfaces. Proven track record of leading agile engineering teams and improving web performance by 45%.'
+            },
+            experience: [
+                {
+                    id: 'exp-1',
+                    position: 'Senior Frontend Engineer',
+                    company: 'Future Digital Technologies',
+                    location: 'Riyadh',
+                    startDate: 'Jan 2023',
+                    endDate: 'Present',
+                    current: true,
+                    description: '• Spearheaded a team of 5 engineers to rebuild the flagship e-commerce platform.\n• Improved page load speed by 45% through code-splitting and smart caching.\n• Architected a reusable component library adopted across 4 product teams.'
+                },
+                {
+                    id: 'exp-2',
+                    position: 'Full Stack Web Developer',
+                    company: 'Smart Software Solutions',
+                    location: 'Jeddah',
+                    startDate: 'Mar 2020',
+                    endDate: 'Dec 2022',
+                    current: false,
+                    description: '• Developed and maintained 12+ enterprise web applications for fintech and logistics clients.\n• Designed secure RESTful APIs and integrated relational databases.\n• Automated CI/CD pipelines, reducing release errors by 30%.'
+                }
+            ],
+            education: [
+                {
+                    id: 'edu-1',
+                    degree: 'B.Sc. in Computer Science & Software Engineering',
+                    institution: 'King Saud University',
+                    location: 'Riyadh',
+                    startDate: '2016',
+                    endDate: '2020',
+                    grade: 'First Class Honors (GPA: 4.75 / 5.00)'
+                }
+            ],
+            skills: [
+                { id: 'sk-1', name: 'JavaScript / TypeScript', level: 95 },
+                { id: 'sk-2', name: 'React.js & Next.js', level: 90 },
+                { id: 'sk-3', name: 'Node.js & Express', level: 85 },
+                { id: 'sk-4', name: 'Tailwind CSS & UI/UX', level: 92 },
+                { id: 'sk-5', name: 'PostgreSQL & MongoDB', level: 80 },
+                { id: 'sk-6', name: 'Git & Docker', level: 85 }
+            ],
+            projects: [
+                {
+                    id: 'prj-1',
+                    name: 'TaskFlow Cloud Project Suite',
+                    role: 'Lead Developer',
+                    link: 'github.com/ahmed/taskflow',
+                    description: 'Real-time collaborative project management platform featuring boards and analytics.'
+                },
+                {
+                    id: 'prj-2',
+                    name: 'Smart E-Invoicing System',
+                    role: 'Frontend Architect',
+                    link: 'fatoorah-app.example.com',
+                    description: 'Electronic invoicing and inventory management dashboard.'
+                }
+            ],
+            languages: [
+                { id: 'lng-1', name: 'Arabic', proficiency: 'Native' },
+                { id: 'lng-2', name: 'English', proficiency: 'Fluent (C1)' }
+            ],
+            certifications: [
+                { id: 'crt-1', name: 'AWS Certified Developer – Associate', issuer: 'Amazon Web Services', year: '2023' },
+                { id: 'crt-2', name: 'Project Management Professional (PMP)', issuer: 'PMI', year: '2022' }
+            ]
+        };
+
+        const EMPTY_DATA = {
+            lang: 'ar',
+            design: { template: 'modern', color: '#1e40af', font: 'cairo' },
+            personal: { fullName: '', jobTitle: '', email: '', phone: '', location: '', website: '', photo: '', summary: '' },
+            experience: [],
+            education: [],
+            skills: [],
+            projects: [],
+            languages: [],
+            certifications: []
+        };
+
+        let cvData = JSON.parse(JSON.stringify(SAMPLE_DATA_AR));
+        let activeTab = 'personal';
+        let memoryFallbackStorage = null;
+
+        // ==========================================
+        // 2. SAFE STORAGE & INITIALIZATION
+        // ==========================================
+
+        function safeSaveStorage(payloadStr) {
+            try {
+                if (window.localStorage) {
+                    window.localStorage.setItem(STORAGE_KEY, payloadStr);
+                    return true;
+                }
+            } catch (err) {
+                // Restricted sandbox / private mode fallback
+            }
+            memoryFallbackStorage = payloadStr;
+            return false;
+        }
+
+        function safeLoadStorage() {
+            try {
+                if (window.localStorage) {
+                    const item = window.localStorage.getItem(STORAGE_KEY);
+                    if (item) return item;
+                }
+            } catch (err) {
+                // Restricted sandbox / private mode fallback
+            }
+            return memoryFallbackStorage;
+        }
+
+        function normalizeData(raw) {
+            const base = JSON.parse(JSON.stringify(SAMPLE_DATA_AR));
+            if (!raw || typeof raw !== 'object') return base;
+            return {
+                lang: raw.lang === 'en' ? 'en' : 'ar',
+                design: {
+                    template: ['modern', 'classic', 'executive'].includes(raw.design?.template) ? raw.design.template : 'modern',
+                    color: typeof raw.design?.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw.design.color) ? raw.design.color : '#1e40af',
+                    font: ['cairo', 'tajawal', 'ibm', 'inter', 'roboto'].includes(raw.design?.font) ? raw.design.font : 'cairo'
+                },
+                personal: {
+                    fullName: String(raw.personal?.fullName || ''),
+                    jobTitle: String(raw.personal?.jobTitle || ''),
+                    email: String(raw.personal?.email || ''),
+                    phone: String(raw.personal?.phone || ''),
+                    location: String(raw.personal?.location || ''),
+                    website: String(raw.personal?.website || ''),
+                    photo: typeof raw.personal?.photo === 'string' && raw.personal.photo.startsWith('data:image/') ? raw.personal.photo : '',
+                    summary: String(raw.personal?.summary || '')
+                },
+                experience: Array.isArray(raw.experience) ? raw.experience : [],
+                education: Array.isArray(raw.education) ? raw.education : [],
+                skills: Array.isArray(raw.skills) ? raw.skills : [],
+                projects: Array.isArray(raw.projects) ? raw.projects : [],
+                languages: Array.isArray(raw.languages) ? raw.languages : [],
+                certifications: Array.isArray(raw.certifications) ? raw.certifications : []
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const rawSaved = safeLoadStorage();
+                if (rawSaved) {
+                    cvData = normalizeData(JSON.parse(rawSaved));
+                }
+            } catch (e) {
+                cvData = JSON.parse(JSON.stringify(SAMPLE_DATA_AR));
+            }
+
+            syncDesignControls();
+            updateLanguageUI();
+            renderForm();
+            renderCV();
+        });
+
+        function saveState() {
+            try {
+                safeSaveStorage(JSON.stringify(cvData));
+            } catch (e) {
+                // Ignore serialization errors
+            }
+        }
+
+        // ==========================================
+        // 3. UI HELPERS (Toast, Modal, Tabs, Mobile)
+        // ==========================================
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-slate-800' : type === 'error' ? 'bg-rose-600' : 'bg-blue-700';
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : type === 'error' ? 'fa-circle-xmark text-white' : 'fa-circle-info text-blue-200';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg text-xs sm:text-sm font-semibold flex items-center gap-2.5 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${escapeHTML(message)}</span>`;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            modal.classList.remove('hidden');
+
+            const okBtn = document.getElementById('confirm-ok-btn');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+
+            okBtn.onclick = () => {
+                cleanup();
+                onConfirm();
+            };
+            cancelBtn.onclick = cleanup;
+        }
+
+        function switchTab(tabName) {
+            activeTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active', 'border-blue-700', 'text-blue-700', 'bg-blue-50/50');
+                    btn.classList.remove('border-transparent', 'text-slate-600');
+                } else {
+                    btn.classList.remove('active', 'border-blue-700', 'text-blue-700', 'bg-blue-50/50');
+                    btn.classList.add('border-transparent', 'text-slate-600');
+                }
+            });
+            renderForm();
+        }
+
+        function setMobileView(view) {
+            const editor = document.getElementById('editor-pane');
+            const preview = document.getElementById('preview-pane');
+            const btnEd = document.getElementById('mob-btn-editor');
+            const btnPr = document.getElementById('mob-btn-preview');
+
+            if (view === 'editor') {
+                editor.classList.remove('hidden');
+                editor.classList.add('flex');
+                preview.classList.add('hidden');
+                preview.classList.remove('flex');
+
+                btnEd.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+                btnEd.classList.remove('text-slate-600');
+                btnPr.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+                btnPr.classList.add('text-slate-600');
+            } else {
+                editor.classList.add('hidden');
+                editor.classList.remove('flex');
+                preview.classList.remove('hidden');
+                preview.classList.add('flex');
+
+                btnPr.classList.add('bg-white', 'text-blue-700', 'shadow-sm');
+                btnPr.classList.remove('text-slate-600');
+                btnEd.classList.remove('bg-white', 'text-blue-700', 'shadow-sm');
+                btnEd.classList.add('text-slate-600');
+            }
+        }
+
+        function toggleBackupMenu() {
+            const menu = document.getElementById('backup-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('backup-menu');
+            if (menu && !menu.contains(e.target) && !e.target.closest('button[onclick="toggleBackupMenu()"]')) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // ==========================================
+        // 4. DESIGN, LANGUAGE & GLOBAL ACTIONS
+        // ==========================================
+
+        function setCVLanguage(lang) {
+            cvData.lang = lang === 'en' ? 'en' : 'ar';
+            if (cvData.lang === 'en' && ['cairo', 'tajawal', 'ibm'].includes(cvData.design.font)) {
+                cvData.design.font = 'inter';
+            } else if (cvData.lang === 'ar' && ['inter', 'roboto'].includes(cvData.design.font)) {
+                cvData.design.font = 'cairo';
+            }
+            syncDesignControls();
+            updateLanguageUI();
+            renderForm();
+            renderCV();
+            saveState();
+        }
+
+        function updateLanguageUI() {
+            const isAr = cvData.lang === 'ar';
+            const btnAr = document.getElementById('lang-btn-ar');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (isAr) {
+                btnAr.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-700 text-white transition';
+                btnEn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            } else {
+                btnEn.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-700 text-white transition';
+                btnAr.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            }
+
+            const dict = UI_TEXT[cvData.lang];
+            document.querySelectorAll('[data-ui]').forEach(el => {
+                const key = el.getAttribute('data-ui');
+                if (dict[key]) el.textContent = dict[key];
+            });
+        }
+
+        function updateDesign(key, value) {
+            cvData.design[key] = value;
+            if (key === 'color') {
+                document.getElementById('custom-color-picker').value = value;
+            }
+            renderCV();
+            saveState();
+        }
+
+        function syncDesignControls() {
+            document.getElementById('template-select').value = cvData.design.template || 'modern';
+            document.getElementById('font-select').value = cvData.design.font || 'cairo';
+            document.getElementById('custom-color-picker').value = cvData.design.color || '#1e40af';
+        }
+
+        function handleLoadSample() {
+            const isAr = cvData.lang === 'ar';
+            showConfirmModal(
+                isAr ? 'تعبئة النموذج التجريبي' : 'Load Sample Data',
+                isAr ? 'سيتم استبدال البيانات الحالية ببيانات نموذج تجريبي جاهز. هل تريد المتابعة؟' : 'Current data will be replaced with sample resume data. Continue?',
+                () => {
+                    const currentDesign = { ...cvData.design };
+                    cvData = JSON.parse(JSON.stringify(isAr ? SAMPLE_DATA_AR : SAMPLE_DATA_EN));
+                    cvData.design = currentDesign;
+                    syncDesignControls();
+                    renderForm();
+                    renderCV();
+                    saveState();
+                    showToast(isAr ? 'تم تحميل النموذج التجريبي بنجاح' : 'Sample data loaded successfully');
+                }
+            );
+        }
+
+        function handleClearAll() {
+            const isAr = cvData.lang === 'ar';
+            showConfirmModal(
+                isAr ? 'مسح جميع البيانات' : 'Clear All Data',
+                isAr ? 'هل أنت متأكد من مسح كافة الحقول والبدء بسيرة ذاتية فارغة؟' : 'Are you sure you want to clear all fields and start fresh?',
+                () => {
+                    const currentLang = cvData.lang;
+                    const currentDesign = { ...cvData.design };
+                    cvData = JSON.parse(JSON.stringify(EMPTY_DATA));
+                    cvData.lang = currentLang;
+                    cvData.design = currentDesign;
+                    renderForm();
+                    renderCV();
+                    saveState();
+                    showToast(isAr ? 'تم مسح جميع البيانات' : 'All fields cleared', 'info');
+                }
+            );
+        }
+
+        function printCV() {
+            try {
+                window.print();
+            } catch (e) {
+                showToast(cvData.lang === 'ar' ? 'تعذر فتح نافذة الطباعة من هذا المتصفح' : 'Print dialog blocked by browser', 'error');
+            }
+        }
+
+        function exportJSON() {
+            document.getElementById('backup-menu').classList.add('hidden');
+            try {
+                const jsonString = JSON.stringify(cvData, null, 2);
+                const safeBaseName = (cvData.personal.fullName || 'resume').trim().replace(/[^a-zA-Z0-9\u0600-\u06FF_-]+/g, '_') || 'resume';
+                const fileName = `${safeBaseName}_CV.json`;
+
+                if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && URL.createObjectURL) {
+                    const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } else {
+                    const dataStr = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonString);
+                    const link = document.createElement('a');
+                    link.href = dataStr;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                }
+
+                showToast(cvData.lang === 'ar' ? 'تم تصدير ملف البيانات بنجاح' : 'JSON backup exported');
+            } catch (err) {
+                showToast(cvData.lang === 'ar' ? 'حدث خطأ أثناء تصدير الملف' : 'Failed to export JSON file', 'error');
+            }
+        }
+
+        function importJSON(event) {
+            document.getElementById('backup-menu').classList.add('hidden');
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            const applyImportedText = (textContent) => {
+                const parsed = JSON.parse(textContent);
+                if (!parsed || typeof parsed !== 'object' || !parsed.personal) {
+                    throw new Error('Invalid CV structure');
+                }
+                cvData = normalizeData(parsed);
+                syncDesignControls();
+                updateLanguageUI();
+                renderForm();
+                renderCV();
+                saveState();
+                showToast(cvData.lang === 'ar' ? 'تم استعادة البيانات بنجاح' : 'Resume data restored successfully');
+            };
+
+            try {
+                if (typeof FileReader !== 'undefined') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            applyImportedText(e.target.result);
+                        } catch (parseErr) {
+                            showToast(cvData.lang === 'ar' ? 'ملف JSON غير صالح!' : 'Invalid JSON file!', 'error');
+                        }
+                    };
+                    reader.onerror = () => {
+                        showToast(cvData.lang === 'ar' ? 'تعذر قراءة الملف المحدد' : 'Unable to read selected file', 'error');
+                    };
+                    reader.readAsText(file);
+                } else if (typeof file.text === 'function') {
+                    file.text().then(applyImportedText).catch(() => {
+                        showToast(cvData.lang === 'ar' ? 'ملف JSON غير صالح!' : 'Invalid JSON file!', 'error');
+                    });
+                } else {
+                    throw new Error('FileReader unsupported');
+                }
+            } catch (err) {
+                showToast(cvData.lang === 'ar' ? 'قراءة الملفات غير مدعومة في هذا الوضع' : 'File reading restricted in this context', 'error');
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        // ==========================================
+        // 5. FORM RENDERING & DATA MUTATIONS
+        // ==========================================
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function updatePersonal(field, value) {
+            cvData.personal[field] = value;
+            renderCV();
+            saveState();
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            if (!file.type || !file.type.startsWith('image/')) {
+                showToast(cvData.lang === 'ar' ? 'يرجى اختيار ملف صورة صالح' : 'Please select a valid image file', 'error');
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToast(cvData.lang === 'ar' ? 'حجم الصورة يجب أن يكون أقل من 2 ميجابايت' : 'Image size must be under 2MB', 'error');
+                return;
+            }
+
+            try {
+                if (typeof FileReader !== 'undefined') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        cvData.personal.photo = e.target.result;
+                        renderForm();
+                        renderCV();
+                        saveState();
+                    };
+                    reader.onerror = () => {
+                        showToast(cvData.lang === 'ar' ? 'تعذر تحميل الصورة' : 'Could not load image', 'error');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast(cvData.lang === 'ar' ? 'رفع الصور غير متاح في هذا المتصفح' : 'Image upload unavailable here', 'error');
+                }
+            } catch (err) {
+                showToast(cvData.lang === 'ar' ? 'تعذر معالجة الصورة' : 'Failed to process image', 'error');
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        function removePhoto() {
+            cvData.personal.photo = '';
+            renderForm();
+            renderCV();
+            saveState();
+        }
+
+        function addItem(section) {
+            const id = section + '-' + Date.now();
+            const isAr = cvData.lang === 'ar';
+            const templates = {
+                experience: { id, position: '', company: '', location: '', startDate: '', endDate: '', current: false, description: '' },
+                education: { id, degree: '', institution: '', location: '', startDate: '', endDate: '', grade: '' },
+                skills: { id, name: '', level: 85 },
+                projects: { id, name: '', role: '', link: '', description: '' },
+                languages: { id, name: '', proficiency: isAr ? 'جيد جداً' : 'Professional' },
+                certifications: { id, name: '', issuer: '', year: '' }
+            };
+            cvData[section].push(templates[section]);
+            renderForm();
+            renderCV();
+            saveState();
+        }
+
+        function updateItem(section, index, field, value) {
+            cvData[section][index][field] = value;
+            renderCV();
+            saveState();
+        }
+
+        function deleteItem(section, index) {
+            cvData[section].splice(index, 1);
+            renderForm();
+            renderCV();
+            saveState();
+        }
+
+        function moveItem(section, index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= cvData[section].length) return;
+            const temp = cvData[section][index];
+            cvData[section][index] = cvData[section][targetIndex];
+            cvData[section][targetIndex] = temp;
+            renderForm();
+            renderCV();
+            saveState();
+        }
+
+        function renderForm() {
+            const container = document.getElementById('form-container');
+            const isAr = cvData.lang === 'ar';
+            container.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+
+            const inputClass = "w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition";
+            const labelClass = "block text-xs font-bold text-slate-700 mb-1";
+
+            if (activeTab === 'personal') {
+                const p = cvData.personal;
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h2 class="text-base font-bold text-slate-800">${isAr ? 'المعلومات الشخصية والملخص' : 'Personal Details & Summary'}</h2>
+                        </div>
+
+                        <div class="flex items-center gap-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+                                ${p.photo
+                                    ? `<img src="${p.photo}" alt="Profile" class="w-full h-full object-cover">`
+                                    : `<i class="fa-solid fa-user text-2xl text-slate-400"></i>`}
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs font-bold text-slate-700 mb-1">${isAr ? 'الصورة الشخصية (اختياري)' : 'Profile Photo (Optional)'}</p>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <label class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer transition shadow-sm">
+                                        <i class="fa-solid fa-camera ${isAr ? 'ml-1' : 'mr-1'}"></i> ${isAr ? 'رفع صورة' : 'Upload Photo'}
+                                        <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                                    </label>
+                                    ${p.photo ? `
+                                        <button type="button" onclick="removePhoto()" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-semibold transition">
+                                            ${isAr ? 'حذف' : 'Remove'}
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'الاسم الكامل *' : 'Full Name *'}</label>
+                                <input type="text" value="${escapeHTML(p.fullName)}" oninput="updatePersonal('fullName', this.value)" placeholder="${isAr ? 'مثال: أحمد محمد المنصور' : 'e.g. John Doe'}" class="${inputClass}">
+                            </div>
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'المسمى الوظيفي *' : 'Job Title *'}</label>
+                                <input type="text" value="${escapeHTML(p.jobTitle)}" oninput="updatePersonal('jobTitle', this.value)" placeholder="${isAr ? 'مثال: مهندس برمجيات' : 'e.g. Software Engineer'}" class="${inputClass}">
+                            </div>
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'البريد الإلكتروني' : 'Email Address'}</label>
+                                <input type="email" value="${escapeHTML(p.email)}" oninput="updatePersonal('email', this.value)" placeholder="name@example.com" class="${inputClass}" dir="ltr">
+                            </div>
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'رقم الهاتف' : 'Phone Number'}</label>
+                                <input type="text" value="${escapeHTML(p.phone)}" oninput="updatePersonal('phone', this.value)" placeholder="+966 50 000 0000" class="${inputClass}" dir="ltr">
+                            </div>
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'المدينة / الدولة' : 'City / Country'}</label>
+                                <input type="text" value="${escapeHTML(p.location)}" oninput="updatePersonal('location', this.value)" placeholder="${isAr ? 'الرياض، السعودية' : 'Riyadh, Saudi Arabia'}" class="${inputClass}">
+                            </div>
+                            <div>
+                                <label class="${labelClass}">${isAr ? 'رابط LinkedIn أو الموقع الشخصي' : 'LinkedIn / Portfolio URL'}</label>
+                                <input type="text" value="${escapeHTML(p.website)}" oninput="updatePersonal('website', this.value)" placeholder="linkedin.com/in/username" class="${inputClass}" dir="ltr">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="${labelClass}">${isAr ? 'النبذة التعريفية / الملخص المهني' : 'Professional Summary'}</label>
+                            <textarea rows="4" oninput="updatePersonal('summary', this.value)" placeholder="${isAr ? 'اكتب ملخصاً موجزاً يبرز خبراتك وأهم إنجازاتك المهنية...' : 'Write a concise summary highlighting your experience and achievements...'}" class="${inputClass} leading-relaxed">${escapeHTML(p.summary)}</textarea>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeTab === 'experience') {
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h2 class="text-base font-bold text-slate-800">${isAr ? 'الخبرات العملية' : 'Work Experience'}</h2>
+                            <button type="button" onclick="addItem('experience')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة خبرة' : 'Add Experience'}
+                            </button>
+                        </div>
+                        ${cvData.experience.length === 0 ? `<p class="text-center text-slate-400 text-sm py-8">${isAr ? 'لا توجد خبرات مضافة بعد. اضغط على "إضافة خبرة".' : 'No experience added yet. Click "Add Experience".'}</p>` : ''}
+                        <div class="space-y-4">
+                            ${cvData.experience.map((exp, idx) => `
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <span class="text-xs font-extrabold text-blue-700">#${idx + 1} ${escapeHTML(exp.position || (isAr ? 'خبرة جديدة' : 'New Role'))}</span>
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" onclick="moveItem('experience', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button type="button" onclick="moveItem('experience', ${idx}, 1)" ${idx === cvData.experience.length - 1 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                            <button type="button" onclick="deleteItem('experience', ${idx})" class="p-1.5 text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'المسمى الوظيفي' : 'Job Title'}</label>
+                                            <input type="text" value="${escapeHTML(exp.position)}" oninput="updateItem('experience', ${idx}, 'position', this.value)" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'اسم الشركة / الجهة' : 'Company / Organization'}</label>
+                                            <input type="text" value="${escapeHTML(exp.company)}" oninput="updateItem('experience', ${idx}, 'company', this.value)" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'تاريخ البداية' : 'Start Date'}</label>
+                                            <input type="text" value="${escapeHTML(exp.startDate)}" oninput="updateItem('experience', ${idx}, 'startDate', this.value)" placeholder="${isAr ? 'مثال: يناير 2022' : 'e.g. Jan 2022'}" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'تاريخ النهاية' : 'End Date'}</label>
+                                            <input type="text" value="${escapeHTML(exp.endDate)}" oninput="updateItem('experience', ${idx}, 'endDate', this.value)" placeholder="${isAr ? 'مثال: حتى الآن' : 'e.g. Present'}" class="${inputClass}">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="${labelClass}">${isAr ? 'المهام والإنجازات (سطر لكل نقطة)' : 'Responsibilities & Achievements (One per line)'}</label>
+                                        <textarea rows="3" oninput="updateItem('experience', ${idx}, 'description', this.value)" class="${inputClass}">${escapeHTML(exp.description)}</textarea>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeTab === 'education') {
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h2 class="text-base font-bold text-slate-800">${isAr ? 'المؤهلات العلمية' : 'Education'}</h2>
+                            <button type="button" onclick="addItem('education')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة مؤهل' : 'Add Education'}
+                            </button>
+                        </div>
+                        ${cvData.education.length === 0 ? `<p class="text-center text-slate-400 text-sm py-8">${isAr ? 'لا توجد مؤهلات علمية مضافة بعد.' : 'No education entries added yet.'}</p>` : ''}
+                        <div class="space-y-4">
+                            ${cvData.education.map((edu, idx) => `
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <span class="text-xs font-extrabold text-blue-700">#${idx + 1} ${escapeHTML(edu.degree || (isAr ? 'مؤهل علمي' : 'Degree'))}</span>
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" onclick="moveItem('education', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button type="button" onclick="moveItem('education', ${idx}, 1)" ${idx === cvData.education.length - 1 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                            <button type="button" onclick="deleteItem('education', ${idx})" class="p-1.5 text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div class="sm:col-span-2">
+                                            <label class="${labelClass}">${isAr ? 'الدرجة العلمية والتخصص' : 'Degree & Major'}</label>
+                                            <input type="text" value="${escapeHTML(edu.degree)}" oninput="updateItem('education', ${idx}, 'degree', this.value)" placeholder="${isAr ? 'مثال: بكالوريوس هندسة البرمجيات' : 'e.g. B.Sc. Computer Science'}" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'الجامعة / المؤسسة التعليمية' : 'University / Institution'}</label>
+                                            <input type="text" value="${escapeHTML(edu.institution)}" oninput="updateItem('education', ${idx}, 'institution', this.value)" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'سنة التخرج أو الفترة' : 'Graduation Year / Period'}</label>
+                                            <input type="text" value="${escapeHTML(edu.endDate)}" oninput="updateItem('education', ${idx}, 'endDate', this.value)" placeholder="2016 - 2020" class="${inputClass}">
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <label class="${labelClass}">${isAr ? 'التقدير / المعدل (اختياري)' : 'GPA / Grade (Optional)'}</label>
+                                            <input type="text" value="${escapeHTML(edu.grade)}" oninput="updateItem('education', ${idx}, 'grade', this.value)" placeholder="${isAr ? 'ممتاز مع مرتبة الشرف' : 'First Class Honors'}" class="${inputClass}">
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeTab === 'skills') {
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h2 class="text-base font-bold text-slate-800">${isAr ? 'المهارات ومستوى الإتقان' : 'Skills & Proficiency'}</h2>
+                            <button type="button" onclick="addItem('skills')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة مهارة' : 'Add Skill'}
+                            </button>
+                        </div>
+                        ${cvData.skills.length === 0 ? `<p class="text-center text-slate-400 text-sm py-8">${isAr ? 'لا توجد مهارات مضافة بعد.' : 'No skills added yet.'}</p>` : ''}
+                        <div class="space-y-2.5">
+                            ${cvData.skills.map((sk, idx) => `
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center gap-3">
+                                    <div class="flex-1">
+                                        <input type="text" value="${escapeHTML(sk.name)}" oninput="updateItem('skills', ${idx}, 'name', this.value)" placeholder="${isAr ? 'اسم المهارة (مثال: إدارة المشاريع)' : 'Skill name (e.g. Project Management)'}" class="${inputClass}">
+                                    </div>
+                                    <div class="flex items-center gap-2 sm:w-44">
+                                        <input type="range" min="20" max="100" step="5" value="${sk.level}" oninput="updateItem('skills', ${idx}, 'level', parseInt(this.value)); this.nextElementSibling.textContent = this.value + '%'" class="w-full accent-blue-700 cursor-pointer">
+                                        <span class="text-xs font-bold text-slate-600 w-9 text-center">${sk.level}%</span>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1">
+                                        <button type="button" onclick="moveItem('skills', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                        <button type="button" onclick="moveItem('skills', ${idx}, 1)" ${idx === cvData.skills.length - 1 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                        <button type="button" onclick="deleteItem('skills', ${idx})" class="p-1.5 text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeTab === 'projects') {
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <h2 class="text-base font-bold text-slate-800">${isAr ? 'المشاريع والأعمال السابقة' : 'Projects & Portfolio'}</h2>
+                            <button type="button" onclick="addItem('projects')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة مشروع' : 'Add Project'}
+                            </button>
+                        </div>
+                        ${cvData.projects.length === 0 ? `<p class="text-center text-slate-400 text-sm py-8">${isAr ? 'لا توجد مشاريع مضافة بعد.' : 'No projects added yet.'}</p>` : ''}
+                        <div class="space-y-4">
+                            ${cvData.projects.map((prj, idx) => `
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <span class="text-xs font-extrabold text-blue-700">#${idx + 1} ${escapeHTML(prj.name || (isAr ? 'مشروع جديد' : 'New Project'))}</span>
+                                        <div class="flex items-center gap-1">
+                                            <button type="button" onclick="moveItem('projects', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+                                            <button type="button" onclick="moveItem('projects', ${idx}, 1)" ${idx === cvData.projects.length - 1 ? 'disabled' : ''} class="p-1.5 text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+                                            <button type="button" onclick="deleteItem('projects', ${idx})" class="p-1.5 text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'اسم المشروع' : 'Project Name'}</label>
+                                            <input type="text" value="${escapeHTML(prj.name)}" oninput="updateItem('projects', ${idx}, 'name', this.value)" class="${inputClass}">
+                                        </div>
+                                        <div>
+                                            <label class="${labelClass}">${isAr ? 'رابط المشروع (اختياري)' : 'Project URL (Optional)'}</label>
+                                            <input type="text" value="${escapeHTML(prj.link)}" oninput="updateItem('projects', ${idx}, 'link', this.value)" dir="ltr" class="${inputClass}">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="${labelClass}">${isAr ? 'وصف المشروع والتقنيات المستخدمة' : 'Description & Technologies'}</label>
+                                        <textarea rows="2" oninput="updateItem('projects', ${idx}, 'description', this.value)" class="${inputClass}">${escapeHTML(prj.description)}</textarea>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeTab === 'extras') {
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <h2 class="text-base font-bold text-slate-800">${isAr ? 'اللغات' : 'Languages'}</h2>
+                                <button type="button" onclick="addItem('languages')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة لغة' : 'Add Language'}
+                                </button>
+                            </div>
+                            <div class="space-y-2.5">
+                                ${cvData.languages.map((lng, idx) => `
+                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+                                        <input type="text" value="${escapeHTML(lng.name)}" oninput="updateItem('languages', ${idx}, 'name', this.value)" placeholder="${isAr ? 'اللغة (مثال: الإنجليزية)' : 'Language'}" class="${inputClass}">
+                                        <input type="text" value="${escapeHTML(lng.proficiency)}" oninput="updateItem('languages', ${idx}, 'proficiency', this.value)" placeholder="${isAr ? 'المستوى (مثال: ممتاز)' : 'Level (e.g. Fluent)'}" class="${inputClass}">
+                                        <button type="button" onclick="deleteItem('languages', ${idx})" class="p-2 text-rose-500 hover:text-rose-700 shrink-0"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <h2 class="text-base font-bold text-slate-800">${isAr ? 'الشهادات المهنية والدورات' : 'Certifications & Courses'}</h2>
+                                <button type="button" onclick="addItem('certifications')" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة شهادة' : 'Add Certification'}
+                                </button>
+                            </div>
+                            <div class="space-y-2.5">
+                                ${cvData.certifications.map((crt, idx) => `
+                                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" value="${escapeHTML(crt.name)}" oninput="updateItem('certifications', ${idx}, 'name', this.value)" placeholder="${isAr ? 'اسم الشهادة أو الدورة' : 'Certification Name'}" class="${inputClass}">
+                                            <button type="button" onclick="deleteItem('certifications', ${idx})" class="p-2 text-rose-500 hover:text-rose-700 shrink-0"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="text" value="${escapeHTML(crt.issuer)}" oninput="updateItem('certifications', ${idx}, 'issuer', this.value)" placeholder="${isAr ? 'الجهة المانحة' : 'Issuing Organization'}" class="${inputClass}">
+                                            <input type="text" value="${escapeHTML(crt.year)}" oninput="updateItem('certifications', ${idx}, 'year', this.value)" placeholder="${isAr ? 'السنة (2024)' : 'Year (2024)'}" class="${inputClass}">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // ==========================================
+        // 6. LIVE A4 CV TEMPLATE RENDERING ENGINE
+        // ==========================================
+
+        function formatMultiline(text) {
+            if (!text) return '';
+            return escapeHTML(text)
+                .split('\n')
+                .filter(line => line.trim() !== '')
+                .map(line => `<div class="mb-1 leading-relaxed">${line}</div>`)
+                .join('');
+        }
+
+        function renderCV() {
+            const doc = document.getElementById('cv-document');
+            const isAr = cvData.lang === 'ar';
+            const labels = UI_TEXT[cvData.lang];
+            const { template, color, font } = cvData.design;
+            const p = cvData.personal;
+
+            doc.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+            doc.style.setProperty('--cv-accent', color);
+
+            const fontMap = {
+                cairo: "'Cairo', 'Segoe UI', 'Tahoma', 'Arial', sans-serif",
+                tajawal: "'Tajawal', 'Segoe UI', 'Tahoma', 'Arial', sans-serif",
+                ibm: "'IBM Plex Sans Arabic', 'Segoe UI', 'Tahoma', 'Arial', sans-serif",
+                inter: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                roboto: "'Roboto', 'Inter', 'Arial', sans-serif"
+            };
+            doc.style.fontFamily = fontMap[font] || fontMap.cairo;
+
+            const contactItems = [
+                p.email ? { icon: 'fa-envelope', val: p.email, ltr: true } : null,
+                p.phone ? { icon: 'fa-phone', val: p.phone, ltr: true } : null,
+                p.location ? { icon: 'fa-location-dot', val: p.location, ltr: false } : null,
+                p.website ? { icon: 'fa-globe', val: p.website, ltr: true } : null
+            ].filter(Boolean);
+
+            if (template === 'modern') {
+                doc.innerHTML = `
+                    <div class="flex min-h-[297mm]">
+                        <aside class="w-[34%] text-white p-7 flex flex-col gap-6 shrink-0" style="background-color: ${color};">
+                            <div class="text-center">
+                                ${p.photo ? `
+                                    <div class="w-28 h-28 mx-auto mb-4 rounded-2xl overflow-hidden border-4 border-white/25 shadow-md">
+                                        <img src="${p.photo}" alt="Avatar" class="w-full h-full object-cover">
+                                    </div>
+                                ` : ''}
+                                <h1 class="text-xl font-extrabold tracking-tight leading-snug mb-1.5">${escapeHTML(p.fullName || (isAr ? 'الاسم الكامل' : 'Your Name'))}</h1>
+                                <p class="text-xs font-medium text-white/85 leading-relaxed">${escapeHTML(p.jobTitle || (isAr ? 'المسمى الوظيفي' : 'Professional Title'))}</p>
+                            </div>
+
+                            ${contactItems.length > 0 ? `
+                                <div class="space-y-2.5 pt-4 border-t border-white/20">
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-white/75 mb-2">${labels.cvContact}</h3>
+                                    ${contactItems.map(item => `
+                                        <div class="flex items-start gap-2.5 text-[11px] text-white/95">
+                                            <i class="fa-solid ${item.icon} mt-0.5 w-3.5 text-center text-white/80 shrink-0"></i>
+                                            <span class="break-all" ${item.ltr ? 'dir="ltr"' : ''}>${escapeHTML(item.val)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+
+                            ${cvData.skills.length > 0 ? `
+                                <div class="space-y-3 pt-4 border-t border-white/20">
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-white/75">${labels.cvSkills}</h3>
+                                    <div class="space-y-2.5">
+                                        ${cvData.skills.map(sk => `
+                                            <div>
+                                                <div class="flex justify-between text-[11px] font-semibold mb-1">
+                                                    <span>${escapeHTML(sk.name)}</span>
+                                                </div>
+                                                <div class="w-full h-1.5 bg-black/25 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-white rounded-full" style="width: ${Math.max(10, Math.min(100, Number(sk.level) || 50))}%"></div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${cvData.languages.length > 0 ? `
+                                <div class="space-y-2.5 pt-4 border-t border-white/20">
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-white/75">${labels.cvLanguages}</h3>
+                                    <div class="space-y-1.5">
+                                        ${cvData.languages.map(lng => `
+                                            <div class="flex justify-between items-center text-[11px]">
+                                                <span class="font-bold">${escapeHTML(lng.name)}</span>
+                                                <span class="text-white/80 text-[10px] bg-white/15 px-2 py-0.5 rounded-md">${escapeHTML(lng.proficiency)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${cvData.certifications.length > 0 ? `
+                                <div class="space-y-2.5 pt-4 border-t border-white/20">
+                                    <h3 class="text-xs font-bold uppercase tracking-wider text-white/75">${labels.cvCertifications}</h3>
+                                    <div class="space-y-2.5">
+                                        ${cvData.certifications.map(crt => `
+                                            <div class="text-[11px]">
+                                                <div class="font-bold leading-snug">${escapeHTML(crt.name)}</div>
+                                                <div class="text-white/75 text-[10px]">${escapeHTML(crt.issuer)} ${crt.year ? `• ${escapeHTML(crt.year)}` : ''}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </aside>
+
+                        <div class="flex-1 p-8 text-slate-800 space-y-6 bg-white">
+                            ${p.summary ? `
+                                <section>
+                                    <h2 class="text-sm font-extrabold uppercase tracking-wider pb-1.5 mb-2.5 border-b-2 flex items-center gap-2" style="color: ${color}; border-color: ${color}25;">
+                                        <i class="fa-solid fa-user-tie text-xs"></i> ${labels.cvSummary}
+                                    </h2>
+                                    <p class="text-xs text-slate-600 leading-relaxed text-justify">${escapeHTML(p.summary)}</p>
+                                </section>
+                            ` : ''}
+
+                            ${cvData.experience.length > 0 ? `
+                                <section>
+                                    <h2 class="text-sm font-extrabold uppercase tracking-wider pb-1.5 mb-3.5 border-b-2 flex items-center gap-2" style="color: ${color}; border-color: ${color}25;">
+                                        <i class="fa-solid fa-briefcase text-xs"></i> ${labels.cvExperience}
+                                    </h2>
+                                    <div class="space-y-4">
+                                        ${cvData.experience.map(exp => `
+                                            <div class="relative ${isAr ? 'pr-3.5 border-r-2' : 'pl-3.5 border-l-2'}" style="border-color: ${color}40;">
+                                                <div class="flex flex-wrap justify-between items-baseline gap-1 mb-0.5">
+                                                    <h3 class="text-[13px] font-bold text-slate-900">${escapeHTML(exp.position)}</h3>
+                                                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${escapeHTML(exp.startDate)} ${exp.endDate ? `- ${escapeHTML(exp.endDate)}` : ''}</span>
+                                                </div>
+                                                <div class="text-xs font-bold mb-1.5" style="color: ${color};">${escapeHTML(exp.company)}</div>
+                                                <div class="text-[11.5px] text-slate-600">${formatMultiline(exp.description)}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </section>
+                            ` : ''}
+
+                            ${cvData.education.length > 0 ? `
+                                <section>
+                                    <h2 class="text-sm font-extrabold uppercase tracking-wider pb-1.5 mb-3 border-b-2 flex items-center gap-2" style="color: ${color}; border-color: ${color}25;">
+                                        <i class="fa-solid fa-graduation-cap text-xs"></i> ${labels.cvEducation}
+                                    </h2>
+                                    <div class="space-y-3">
+                                        ${cvData.education.map(edu => `
+                                            <div>
+                                                <div class="flex justify-between items-baseline gap-2">
+                                                    <h3 class="text-[13px] font-bold text-slate-900">${escapeHTML(edu.degree)}</h3>
+                                                    <span class="text-[11px] font-semibold text-slate-500 shrink-0">${escapeHTML(edu.endDate)}</span>
+                                                </div>
+                                                <div class="text-xs font-semibold text-slate-700">${escapeHTML(edu.institution)}</div>
+                                                ${edu.grade ? `<div class="text-[11px] text-slate-500 mt-0.5">${escapeHTML(edu.grade)}</div>` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </section>
+                            ` : ''}
+
+                            ${cvData.projects.length > 0 ? `
+                                <section>
+                                    <h2 class="text-sm font-extrabold uppercase tracking-wider pb-1.5 mb-3 border-b-2 flex items-center gap-2" style="color: ${color}; border-color: ${color}25;">
+                                        <i class="fa-solid fa-folder-open text-xs"></i> ${labels.cvProjects}
+                                    </h2>
+                                    <div class="space-y-3">
+                                        ${cvData.projects.map(prj => `
+                                            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                                                <div class="flex justify-between items-center gap-2 mb-1">
+                                                    <h3 class="text-xs font-bold text-slate-900">${escapeHTML(prj.name)}</h3>
+                                                    ${prj.link ? `<span class="text-[10px] font-medium text-slate-500" dir="ltr">${escapeHTML(prj.link)}</span>` : ''}
+                                                </div>
+                                                <p class="text-[11px] text-slate-600 leading-relaxed">${escapeHTML(prj.description)}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </section>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            else if (template === 'classic') {
+                doc.innerHTML = `
+                    <div class="p-10 text-slate-800 space-y-5">
+                        <header class="text-center pb-5 border-b-2" style="border-color: ${color};">
+                            ${p.photo ? `
+                                <img src="${p.photo}" alt="Avatar" class="w-20 h-20 rounded-full mx-auto mb-3 object-cover border-2" style="border-color: ${color};">
+                            ` : ''}
+                            <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 mb-1">${escapeHTML(p.fullName || (isAr ? 'الاسم الكامل' : 'Your Name'))}</h1>
+                            <p class="text-sm font-bold mb-3" style="color: ${color};">${escapeHTML(p.jobTitle || '')}</p>
+
+                            <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+                                ${contactItems.map(item => `
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fa-solid ${item.icon} text-[10px]" style="color: ${color};"></i>
+                                        <span ${item.ltr ? 'dir="ltr"' : ''}>${escapeHTML(item.val)}</span>
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </header>
+
+                        ${p.summary ? `
+                            <section>
+                                <h2 class="text-xs font-extrabold uppercase tracking-wider mb-1.5 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvSummary}</h2>
+                                <p class="text-xs text-slate-700 leading-relaxed">${escapeHTML(p.summary)}</p>
+                            </section>
+                        ` : ''}
+
+                        ${cvData.experience.length > 0 ? `
+                            <section>
+                                <h2 class="text-xs font-extrabold uppercase tracking-wider mb-2.5 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvExperience}</h2>
+                                <div class="space-y-3.5">
+                                    ${cvData.experience.map(exp => `
+                                        <div>
+                                            <div class="flex justify-between items-baseline">
+                                                <h3 class="text-[13px] font-bold text-slate-900">${escapeHTML(exp.position)} — <span class="font-semibold text-slate-700">${escapeHTML(exp.company)}</span></h3>
+                                                <span class="text-[11px] font-semibold text-slate-500">${escapeHTML(exp.startDate)} ${exp.endDate ? `- ${escapeHTML(exp.endDate)}` : ''}</span>
+                                            </div>
+                                            <div class="text-[11.5px] text-slate-600 mt-1">${formatMultiline(exp.description)}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        ` : ''}
+
+                        ${cvData.education.length > 0 ? `
+                            <section>
+                                <h2 class="text-xs font-extrabold uppercase tracking-wider mb-2 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvEducation}</h2>
+                                <div class="space-y-2">
+                                    ${cvData.education.map(edu => `
+                                        <div class="flex justify-between items-baseline">
+                                            <div>
+                                                <span class="text-[13px] font-bold text-slate-900">${escapeHTML(edu.degree)}</span>
+                                                <span class="text-xs text-slate-600"> | ${escapeHTML(edu.institution)} ${edu.grade ? `(${escapeHTML(edu.grade)})` : ''}</span>
+                                            </div>
+                                            <span class="text-[11px] font-semibold text-slate-500">${escapeHTML(edu.endDate)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        ` : ''}
+
+                        ${cvData.projects.length > 0 ? `
+                            <section>
+                                <h2 class="text-xs font-extrabold uppercase tracking-wider mb-2 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvProjects}</h2>
+                                <div class="space-y-2">
+                                    ${cvData.projects.map(prj => `
+                                        <div>
+                                            <div class="flex justify-between items-baseline">
+                                                <h3 class="text-xs font-bold text-slate-900">${escapeHTML(prj.name)}</h3>
+                                                ${prj.link ? `<span class="text-[10px] text-slate-500" dir="ltr">${escapeHTML(prj.link)}</span>` : ''}
+                                            </div>
+                                            <p class="text-[11.5px] text-slate-600">${escapeHTML(prj.description)}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        ` : ''}
+
+                        <div class="grid grid-cols-2 gap-6 pt-1">
+                            ${cvData.skills.length > 0 ? `
+                                <section>
+                                    <h2 class="text-xs font-extrabold uppercase tracking-wider mb-2 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvSkills}</h2>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        ${cvData.skills.map(sk => `
+                                            <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">${escapeHTML(sk.name)}</span>
+                                        `).join('')}
+                                    </div>
+                                </section>
+                            ` : ''}
+
+                            <div class="space-y-4">
+                                ${cvData.languages.length > 0 ? `
+                                    <section>
+                                        <h2 class="text-xs font-extrabold uppercase tracking-wider mb-1.5 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvLanguages}</h2>
+                                        <div class="text-xs text-slate-700 space-y-1">
+                                            ${cvData.languages.map(l => `<div><span class="font-bold">${escapeHTML(l.name)}:</span> ${escapeHTML(l.proficiency)}</div>`).join('')}
+                                        </div>
+                                    </section>
+                                ` : ''}
+
+                                ${cvData.certifications.length > 0 ? `
+                                    <section>
+                                        <h2 class="text-xs font-extrabold uppercase tracking-wider mb-1.5 pb-1 border-b border-slate-200" style="color: ${color};">${labels.cvCertifications}</h2>
+                                        <div class="text-xs text-slate-700 space-y-1">
+                                            ${cvData.certifications.map(c => `<div><span class="font-bold">${escapeHTML(c.name)}</span> — ${escapeHTML(c.issuer)} (${escapeHTML(c.year)})</div>`).join('')}
+                                        </div>
+                                    </section>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (template === 'executive') {
+                doc.innerHTML = `
+                    <div class="min-h-[297mm] flex flex-col">
+                        <header class="p-8 text-white flex items-center justify-between gap-6" style="background-color: ${color};">
+                            <div class="flex-1">
+                                <h1 class="text-2xl font-extrabold tracking-tight mb-1">${escapeHTML(p.fullName || (isAr ? 'الاسم الكامل' : 'Your Name'))}</h1>
+                                <p class="text-sm font-medium text-white/90 mb-4">${escapeHTML(p.jobTitle || '')}</p>
+                                <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-white/90">
+                                    ${contactItems.map(item => `
+                                        <span class="flex items-center gap-1.5">
+                                            <i class="fa-solid ${item.icon} text-white/75"></i>
+                                            <span ${item.ltr ? 'dir="ltr"' : ''}>${escapeHTML(item.val)}</span>
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ${p.photo ? `
+                                <img src="${p.photo}" alt="Avatar" class="w-24 h-24 rounded-2xl object-cover border-2 border-white/30 shadow-lg shrink-0">
+                            ` : ''}
+                        </header>
+
+                        <div class="p-8 flex-1 space-y-6 text-slate-800">
+                            ${p.summary ? `
+                                <section class="p-4 rounded-xl bg-slate-50 ${isAr ? 'border-r-4' : 'border-l-4'}" style="border-color: ${color};">
+                                    <p class="text-xs text-slate-700 leading-relaxed">${escapeHTML(p.summary)}</p>
+                                </section>
+                            ` : ''}
+
+                            <div class="grid grid-cols-12 gap-7">
+                                <div class="col-span-8 space-y-6">
+                                    ${cvData.experience.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-3 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvExperience}
+                                            </h2>
+                                            <div class="space-y-4">
+                                                ${cvData.experience.map(exp => `
+                                                    <div>
+                                                        <div class="flex justify-between items-baseline">
+                                                            <h3 class="text-[13px] font-bold text-slate-900">${escapeHTML(exp.position)}</h3>
+                                                            <span class="text-[11px] font-bold" style="color: ${color};">${escapeHTML(exp.startDate)} - ${escapeHTML(exp.endDate)}</span>
+                                                        </div>
+                                                        <div class="text-xs font-semibold text-slate-500 mb-1">${escapeHTML(exp.company)}</div>
+                                                        <div class="text-[11.5px] text-slate-600">${formatMultiline(exp.description)}</div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+
+                                    ${cvData.projects.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-3 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvProjects}
+                                            </h2>
+                                            <div class="space-y-3">
+                                                ${cvData.projects.map(prj => `
+                                                    <div>
+                                                        <h3 class="text-xs font-bold text-slate-900">${escapeHTML(prj.name)} ${prj.link ? `<span class="font-normal text-slate-400 text-[10px]" dir="ltr">(${escapeHTML(prj.link)})</span>` : ''}</h3>
+                                                        <p class="text-[11.5px] text-slate-600 mt-0.5">${escapeHTML(prj.description)}</p>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+                                </div>
+
+                                <div class="col-span-4 space-y-6">
+                                    ${cvData.education.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-2.5 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvEducation}
+                                            </h2>
+                                            <div class="space-y-3">
+                                                ${cvData.education.map(edu => `
+                                                    <div>
+                                                        <h3 class="text-xs font-bold text-slate-900">${escapeHTML(edu.degree)}</h3>
+                                                        <div class="text-[11px] text-slate-600">${escapeHTML(edu.institution)}</div>
+                                                        <div class="text-[10px] font-semibold text-slate-400">${escapeHTML(edu.endDate)}</div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+
+                                    ${cvData.skills.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-2.5 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvSkills}
+                                            </h2>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                ${cvData.skills.map(sk => `
+                                                    <span class="text-[11px] font-semibold px-2 py-1 rounded-lg bg-slate-100 text-slate-800">${escapeHTML(sk.name)}</span>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+
+                                    ${cvData.languages.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-2 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvLanguages}
+                                            </h2>
+                                            <div class="space-y-1 text-xs">
+                                                ${cvData.languages.map(l => `
+                                                    <div class="flex justify-between">
+                                                        <span class="font-bold text-slate-800">${escapeHTML(l.name)}</span>
+                                                        <span class="text-slate-500">${escapeHTML(l.proficiency)}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+
+                                    ${cvData.certifications.length > 0 ? `
+                                        <section>
+                                            <h2 class="text-sm font-extrabold uppercase tracking-wider mb-2 flex items-center gap-2" style="color: ${color};">
+                                                <span class="w-2 h-2 rounded-full" style="background-color: ${color};"></span>
+                                                ${labels.cvCertifications}
+                                            </h2>
+                                            <div class="space-y-2 text-[11px]">
+                                                ${cvData.certifications.map(c => `
+                                                    <div>
+                                                        <div class="font-bold text-slate-800">${escapeHTML(c.name)}</div>
+                                                        <div class="text-slate-500">${escapeHTML(c.issuer)} • ${escapeHTML(c.year)}</div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </section>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
